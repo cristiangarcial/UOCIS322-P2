@@ -10,11 +10,16 @@ app = Flask(__name__)
 options = config.configuration()
 DOCROOT = options.DOCROOT
 
-@app.route("/path:page")
-def hello(page):
+@app.route("/<path:site>")
+def hello(site):
     options = get_options()
     DOCROOT = options.DOCROOT
-    return "UOCIS docker demo!\n"
+    if "~" in site or ".." in site or "//" in site:
+        abort(403)
+    elif site not int os.listdir(DOCROOT):
+        abort(404)
+    else:
+        return send_from_directory('DOCROOT', site), 200
 
 @app.errorhandler(404)
 def not_found(e):
